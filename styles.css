@@ -522,6 +522,148 @@ body {
   color: var(--text-secondary);
 }
 
+/* ===== HERO TIP ===== */
+.hero-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  background: rgba(248, 156, 28, 0.06);
+  border: 1px solid rgba(248, 156, 28, 0.2);
+  border-radius: var(--radius);
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.hero-tip .tip-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ===== COMBO CARD ===== */
+.combo-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 12px;
+  transition: border-color 0.15s;
+}
+
+.combo-card:hover {
+  border-color: var(--text-muted);
+}
+
+.combo-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.combo-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  flex: 1;
+}
+
+.combo-tier {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 99px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.combo-tier.S { background: rgba(248, 156, 28, 0.2); color: var(--accent); }
+.combo-tier.A { background: rgba(94, 189, 86, 0.2); color: var(--strong); }
+.combo-tier.B { background: rgba(91, 143, 212, 0.2); color: var(--tank); }
+
+.combo-heroes {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.combo-hero-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 4px;
+  background: var(--bg-tertiary);
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.combo-plus {
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.combo-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ===== META TIPS SECTION ===== */
+.meta-section {
+  margin-bottom: 2rem;
+}
+
+.meta-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tip-list-item {
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--accent);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.combos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 12px;
+}
+
+/* ===== SYNERGY ITEM ===== */
+.synergy-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--tank);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 /* ===== CLEAR BUTTON ===== */
 .clear-btn {
   background: none;

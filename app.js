@@ -13,12 +13,32 @@ function heroImg(name, size) {
   return `<img class="hero-portrait" src="${hero.portrait}" alt="${name}" width="${size}" height="${size}">`;
 }
 
+// Helper: render a combo card
+function renderComboCard(combo) {
+  return `
+    <div class="combo-card">
+      <div class="combo-header">
+        <span class="combo-name">${combo.name}</span>
+        <span class="combo-tier ${combo.tier}">Tier ${combo.tier}</span>
+      </div>
+      <div class="combo-heroes">
+        ${combo.heroes.map((h, i) => {
+          const pills = `<span class="combo-hero-pill">${heroImg(h, 24)} ${h}</span>`;
+          return i < combo.heroes.length - 1 ? pills + '<span class="combo-plus">+</span>' : pills;
+        }).join('')}
+      </div>
+      <div class="combo-desc">${combo.description}</div>
+    </div>
+  `;
+}
+
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   renderHeroGrid('tab1-hero-grid', handleTab1HeroClick);
   renderHeroGrid('tab2-hero-grid', handleTab2HeroClick);
   renderHeroGrid('tab3-hero-grid', handleTab3HeroClick);
+  renderMetaTipsTab();
 
   document.getElementById('clear-enemy').addEventListener('click', () => {
     state.enemyTeam = [];
@@ -97,6 +117,7 @@ function renderHeroInfo(heroName) {
   }
 
   const roleClass = hero.role.toLowerCase();
+  const combos = getCombosForHero(heroName);
 
   let html = `
     <div class="selected-hero-header">
@@ -106,6 +127,12 @@ function renderHeroInfo(heroName) {
       </div>
       <span class="hero-role role-tag ${roleClass}">${hero.role}</span>
     </div>
+
+    <div class="hero-tip">
+      <span class="tip-icon">&#128161;</span>
+      <div>${hero.tip}</div>
+    </div>
+
     <div class="hero-info-container">
       <div class="info-card">
         <h3><span class="strong">&#9650;</span> Strong Against</h3>
@@ -135,8 +162,34 @@ function renderHeroInfo(heroName) {
           }).join('')}
         </div>
       </div>
+      <div class="info-card">
+        <h3><span style="color:var(--tank);">&#9829;</span> Best Synergies</h3>
+        <div class="matchup-list">
+          ${hero.synergies.map(name => {
+            const target = HEROES[name];
+            const tRole = target ? target.role.toLowerCase() : '';
+            return `<div class="synergy-item">
+              ${heroImg(name, 32)}
+              <span class="role-tag ${tRole}">${target ? target.role : ''}</span>
+              ${name}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
     </div>
   `;
+
+  // Show combos this hero is part of
+  if (combos.length > 0) {
+    html += `
+      <div class="info-card" style="margin-top:1.5rem;">
+        <h3><span style="color:var(--accent);">&#9889;</span> Power Combos with ${heroName}</h3>
+        <div class="combos-grid">
+          ${combos.map(c => renderComboCard(c)).join('')}
+        </div>
+      </div>
+    `;
+  }
 
   container.innerHTML = html;
 }
@@ -181,13 +234,11 @@ function refreshTab2() {
     return;
   }
 
-  // Group top picks by role
   const grouped = { Tank: [], DPS: [], Support: [] };
   topPicks.forEach(([name, data]) => {
     grouped[data.role].push({ name, ...data });
   });
 
-  // Build cards like Tab 1's layout
   let cards = '';
   for (const [role, heroes] of Object.entries(grouped)) {
     if (heroes.length === 0) continue;
@@ -211,7 +262,6 @@ function refreshTab2() {
     `;
   }
 
-  // Build the matchup details card
   let detailItems = '';
   topPicks.slice(0, 8).forEach(([name, data]) => {
     const lines = [];
@@ -227,6 +277,12 @@ function refreshTab2() {
       `;
     }
   });
+
+  // Find combos possible among the top counter picks
+  const topNames = topPicks.map(([n]) => n);
+  const possibleCombos = POWER_COMBOS.filter(c =>
+    c.heroes.every(h => topNames.includes(h))
+  ).slice(0, 4);
 
   let html = `
     <div class="selected-hero-header" style="margin-top:1.5rem;">
@@ -244,6 +300,17 @@ function refreshTab2() {
       <div class="info-card" style="margin-top:1.5rem;">
         <h3>Matchup Details</h3>
         <div class="matchup-list">${detailItems}</div>
+      </div>
+    `;
+  }
+
+  if (possibleCombos.length > 0) {
+    html += `
+      <div class="info-card" style="margin-top:1.5rem;">
+        <h3><span style="color:var(--accent);">&#9889;</span> Power Combos You Could Run</h3>
+        <div class="combos-grid">
+          ${possibleCombos.map(c => renderComboCard(c)).join('')}
+        </div>
       </div>
     `;
   }
@@ -295,7 +362,6 @@ function refreshTab3() {
   const medium = threats.filter(([, d]) => d.threatScore >= 2 && d.threatScore < 4);
   const low = threats.filter(([, d]) => d.threatScore >= 1 && d.threatScore < 2);
 
-  // Build threat cards in the same style as Tab 1
   let cards = '';
 
   if (high.length > 0) {
@@ -336,7 +402,6 @@ function refreshTab3() {
     `;
   }
 
-  // Build details card showing which allies each threat counters
   let detailItems = '';
   threats.slice(0, 8).forEach(([name, data]) => {
     if (data.strongAgainst.length > 0) {
@@ -351,6 +416,11 @@ function refreshTab3() {
       `;
     }
   });
+
+  // Active combos on this team
+  const activeCombos = getCombosForTeam(state.yourTeam);
+  // Combos that need one more hero
+  const partialCombos = getPartialCombos(state.yourTeam).slice(0, 4);
 
   let html = `
     <div class="selected-hero-header" style="margin-top:1.5rem;">
@@ -372,7 +442,94 @@ function refreshTab3() {
     `;
   }
 
+  // Show active combos
+  if (activeCombos.length > 0) {
+    html += `
+      <div class="info-card" style="margin-top:1.5rem;">
+        <h3><span style="color:var(--strong);">&#9889;</span> Active Power Combos on Your Team</h3>
+        <div class="combos-grid">
+          ${activeCombos.map(c => renderComboCard(c)).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // Show partial combos they could complete
+  if (partialCombos.length > 0) {
+    html += `
+      <div class="info-card" style="margin-top:1.5rem;">
+        <h3><span style="color:var(--accent);">&#128161;</span> Combos You Could Unlock</h3>
+        <div class="combos-grid">
+          ${partialCombos.map(c => `
+            <div class="combo-card">
+              <div class="combo-header">
+                <span class="combo-name">${c.name}</span>
+                <span class="combo-tier ${c.tier}">Tier ${c.tier}</span>
+              </div>
+              <div class="combo-heroes">
+                ${c.heroes.map((h, i) => {
+                  const have = c.have.includes(h);
+                  const pill = `<span class="combo-hero-pill" style="${have ? '' : 'opacity:0.5; border:1px dashed var(--border);'}">${heroImg(h, 24)} ${h} ${have ? '&#10003;' : '?'}</span>`;
+                  return i < c.heroes.length - 1 ? pill + '<span class="combo-plus">+</span>' : pill;
+                }).join('')}
+              </div>
+              <div class="combo-desc">${c.description}</div>
+              <div style="margin-top:8px; font-size:0.8rem; color:var(--accent);">Swap in <strong>${c.need.join(' or ')}</strong> to unlock this combo</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
   resultsEl.innerHTML = html;
+}
+
+// ===== TAB 4: META TIPS & COMBOS =====
+function renderMetaTipsTab() {
+  const container = document.getElementById('meta-tips-content');
+
+  // Power combos section
+  const sTier = POWER_COMBOS.filter(c => c.tier === 'S');
+  const aTier = POWER_COMBOS.filter(c => c.tier === 'A');
+  const bTier = POWER_COMBOS.filter(c => c.tier === 'B');
+
+  let html = `
+    <div class="meta-section">
+      <div class="meta-section-title"><span style="color:var(--accent);">&#9889;</span> S-Tier Power Combos</div>
+      <div class="combos-grid">
+        ${sTier.map(c => renderComboCard(c)).join('')}
+      </div>
+    </div>
+
+    <div class="meta-section">
+      <div class="meta-section-title"><span style="color:var(--strong);">&#9889;</span> A-Tier Power Combos</div>
+      <div class="combos-grid">
+        ${aTier.map(c => renderComboCard(c)).join('')}
+      </div>
+    </div>
+
+    <div class="meta-section">
+      <div class="meta-section-title"><span style="color:var(--tank);">&#9889;</span> B-Tier Power Combos</div>
+      <div class="combos-grid">
+        ${bTier.map(c => renderComboCard(c)).join('')}
+      </div>
+    </div>
+  `;
+
+  // Meta tips sections
+  META_TIPS.forEach(section => {
+    html += `
+      <div class="meta-section">
+        <div class="meta-section-title">&#128218; ${section.category}</div>
+        <div class="tip-list">
+          ${section.tips.map(t => `<div class="tip-list-item">${t}</div>`).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
 }
 
 // ===== SHARED: TEAM SLOTS =====
