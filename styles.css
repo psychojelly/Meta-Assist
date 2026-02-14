@@ -164,20 +164,20 @@ body {
 .hero-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .hero-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 10px;
+  padding: 10px 16px;
   border: 2px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-card);
   color: var(--text-primary);
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   font-weight: 500;
   transition: all 0.15s;
   user-select: none;
@@ -316,30 +316,33 @@ body {
   text-transform: uppercase;
 }
 
-/* ===== TEAM BUILDER (Tabs 2 & 3) ===== */
-.builder-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin-top: 1rem;
+/* ===== TEAM BAR (Tabs 2 & 3) ===== */
+.team-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+}
+
+.team-bar strong {
+  white-space: nowrap;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .team-slots {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 1.5rem;
-  min-height: 50px;
-  padding: 12px;
-  background: var(--bg-secondary);
-  border: 2px dashed var(--border);
-  border-radius: var(--radius-lg);
+  flex: 1;
   align-items: center;
-}
-
-.team-slots.has-heroes {
-  border-style: solid;
-  border-color: var(--border);
+  min-height: 40px;
 }
 
 .team-slots .placeholder {
@@ -351,10 +354,10 @@ body {
 .team-slot {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
+  gap: 8px;
+  padding: 8px 14px;
   border-radius: var(--radius);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
@@ -384,25 +387,12 @@ body {
 }
 
 .team-slot .remove {
-  font-size: 1rem;
+  font-size: 1.1rem;
   line-height: 1;
   opacity: 0.6;
 }
 
-/* ===== RESULTS PANEL ===== */
-.results-panel {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-}
-
-.results-panel h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
+/* ===== RESULTS ===== */
 .results-empty {
   color: var(--text-muted);
   font-style: italic;

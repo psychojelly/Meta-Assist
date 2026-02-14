@@ -36,24 +36,18 @@
     <div class="section-title"><span class="icon">&#9876;</span> Counter the Enemy Team</div>
     <p class="section-subtitle">Pick the enemy team's heroes and we'll show you the best counter-picks.</p>
 
-    <div class="builder-layout">
-      <div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-          <strong>Enemy Team</strong>
-          <button id="clear-enemy" class="clear-btn">Clear All</button>
-        </div>
-        <div id="enemy-team-slots" class="team-slots">
-          <span class="placeholder">Click heroes below to add them (max 5)</span>
-        </div>
-        <div id="tab2-hero-grid" style="margin-top:1rem;"></div>
+    <div class="team-bar">
+      <strong>Enemy Team</strong>
+      <div id="enemy-team-slots" class="team-slots">
+        <span class="placeholder">Click heroes below to add them (max 5)</span>
       </div>
+      <button id="clear-enemy" class="clear-btn">Clear All</button>
+    </div>
 
-      <div>
-        <div id="counter-results" class="results-panel">
-          <h3>Best Counter-Picks</h3>
-          <p class="results-empty">Select enemy heroes to see the best counter-picks for your team.</p>
-        </div>
-      </div>
+    <div id="tab2-hero-grid"></div>
+
+    <div id="counter-results">
+      <p class="results-empty" style="margin-top: 2rem;">Select enemy heroes to see the best counter-picks for your team.</p>
     </div>
   </section>
 
@@ -62,24 +56,18 @@
     <div class="section-title"><span class="icon">&#128737;</span> Your Team's Weaknesses</div>
     <p class="section-subtitle">Pick your team's heroes to see what enemy picks threaten you most.</p>
 
-    <div class="builder-layout">
-      <div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-          <strong>Your Team</strong>
-          <button id="clear-your" class="clear-btn">Clear All</button>
-        </div>
-        <div id="your-team-slots" class="team-slots">
-          <span class="placeholder">Click heroes below to add them (max 5)</span>
-        </div>
-        <div id="tab3-hero-grid" style="margin-top:1rem;"></div>
+    <div class="team-bar">
+      <strong>Your Team</strong>
+      <div id="your-team-slots" class="team-slots">
+        <span class="placeholder">Click heroes below to add them (max 5)</span>
       </div>
+      <button id="clear-your" class="clear-btn">Clear All</button>
+    </div>
 
-      <div>
-        <div id="vulnerability-results" class="results-panel">
-          <h3>Threats to Your Team</h3>
-          <p class="results-empty">Select your team's heroes to see what you're vulnerable to.</p>
-        </div>
-      </div>
+    <div id="tab3-hero-grid"></div>
+
+    <div id="vulnerability-results">
+      <p class="results-empty" style="margin-top: 2rem;">Select your team's heroes to see what you're vulnerable to.</p>
     </div>
   </section>
 
