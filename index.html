@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meta Assist - Overwatch Counter-Pick Tool</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <h1>Meta Assist</h1>
+    <p>Overwatch 2 Counter-Pick Tool</p>
+  </header>
+
+  <!-- TAB NAVIGATION -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="tab-hero-info">Hero Lookup</button>
+    <button class="tab-btn" data-tab="tab-enemy-team">Counter Enemy Team</button>
+    <button class="tab-btn" data-tab="tab-your-team">Your Team Weaknesses</button>
+  </nav>
+
+  <!-- TAB 1: HERO LOOKUP -->
+  <section id="tab-hero-info" class="tab-panel active">
+    <div class="section-title"><span class="icon">&#128269;</span> Hero Lookup</div>
+    <p class="section-subtitle">Select a hero to see who they're strong and weak against.</p>
+    <div id="tab1-hero-grid"></div>
+    <div id="hero-info-results">
+      <p class="results-empty" style="margin-top: 2rem;">Select a hero above to view their matchups.</p>
+    </div>
+  </section>
+
+  <!-- TAB 2: COUNTER ENEMY TEAM -->
+  <section id="tab-enemy-team" class="tab-panel">
+    <div class="section-title"><span class="icon">&#9876;</span> Counter the Enemy Team</div>
+    <p class="section-subtitle">Pick the enemy team's heroes and we'll show you the best counter-picks.</p>
+
+    <div class="builder-layout">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <strong>Enemy Team</strong>
+          <button id="clear-enemy" class="clear-btn">Clear All</button>
+        </div>
+        <div id="enemy-team-slots" class="team-slots">
+          <span class="placeholder">Click heroes below to add them (max 5)</span>
+        </div>
+        <div id="tab2-hero-grid" style="margin-top:1rem;"></div>
+      </div>
+
+      <div>
+        <div id="counter-results" class="results-panel">
+          <h3>Best Counter-Picks</h3>
+          <p class="results-empty">Select enemy heroes to see the best counter-picks for your team.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: YOUR TEAM WEAKNESSES -->
+  <section id="tab-your-team" class="tab-panel">
+    <div class="section-title"><span class="icon">&#128737;</span> Your Team's Weaknesses</div>
+    <p class="section-subtitle">Pick your team's heroes to see what enemy picks threaten you most.</p>
+
+    <div class="builder-layout">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <strong>Your Team</strong>
+          <button id="clear-your" class="clear-btn">Clear All</button>
+        </div>
+        <div id="your-team-slots" class="team-slots">
+          <span class="placeholder">Click heroes below to add them (max 5)</span>
+        </div>
+        <div id="tab3-hero-grid" style="margin-top:1rem;"></div>
+      </div>
+
+      <div>
+        <div id="vulnerability-results" class="results-panel">
+          <h3>Threats to Your Team</h3>
+          <p class="results-empty">Select your team's heroes to see what you're vulnerable to.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="heroes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
