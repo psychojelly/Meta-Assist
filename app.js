@@ -67,7 +67,7 @@ function renderHeroGrid(containerId, clickHandler) {
       const btn = document.createElement('button');
       btn.className = 'hero-btn';
       btn.dataset.hero = heroName;
-      btn.innerHTML = `<img class="hero-portrait" src="${hero.portrait}" alt="${heroName}" width="32" height="32">${heroName}`;
+      btn.innerHTML = `<img class="hero-portrait" src="${hero.portrait}" alt="${heroName}" width="40" height="40">${heroName}`;
       btn.addEventListener('click', () => clickHandler(heroName, btn));
       grid.appendChild(btn);
     });
@@ -114,7 +114,7 @@ function renderHeroInfo(heroName) {
             const target = HEROES[name];
             const tRole = target ? target.role.toLowerCase() : '';
             return `<div class="matchup-item strong">
-              ${heroImg(name, 28)}
+              ${heroImg(name, 32)}
               <span class="role-tag ${tRole}">${target ? target.role : ''}</span>
               ${name}
             </div>`;
@@ -128,7 +128,7 @@ function renderHeroInfo(heroName) {
             const target = HEROES[name];
             const tRole = target ? target.role.toLowerCase() : '';
             return `<div class="matchup-item weak">
-              ${heroImg(name, 28)}
+              ${heroImg(name, 32)}
               <span class="role-tag ${tRole}">${target ? target.role : ''}</span>
               ${name}
             </div>`;
@@ -181,36 +181,73 @@ function refreshTab2() {
     return;
   }
 
+  // Group top picks by role
   const grouped = { Tank: [], DPS: [], Support: [] };
   topPicks.forEach(([name, data]) => {
     grouped[data.role].push({ name, ...data });
   });
 
-  let html = '<div class="scroll-results">';
-
+  // Build cards like Tab 1's layout
+  let cards = '';
   for (const [role, heroes] of Object.entries(grouped)) {
     if (heroes.length === 0) continue;
-    html += `
-      <div class="result-group">
-        <div class="result-group-title">${role} Picks</div>
-        ${heroes.map(h => `
-          <div class="result-item">
-            ${heroImg(h.name, 28)}
-            <span class="result-hero-name">${h.name}</span>
-            <span class="result-matchups">
-              ${h.strongAgainst.map(e => `<span class="result-matchup-tag strong">beats ${e}</span>`).join('')}
-              ${h.weakAgainst.map(e => `<span class="result-matchup-tag weak">weak vs ${e}</span>`).join('')}
-            </span>
-            <span class="result-score ${h.score > 0 ? 'positive' : h.score < 0 ? 'negative' : 'neutral'}">
-              ${h.score > 0 ? '+' : ''}${h.score}
-            </span>
-          </div>
-        `).join('')}
+    const roleClass = role.toLowerCase();
+    cards += `
+      <div class="info-card">
+        <h3><span class="strong">&#9650;</span> Best ${role} Picks</h3>
+        <div class="matchup-list">
+          ${heroes.map(h => `
+            <div class="matchup-item strong">
+              ${heroImg(h.name, 32)}
+              <span class="role-tag ${roleClass}">${role}</span>
+              ${h.name}
+              <span class="result-score ${h.score > 0 ? 'positive' : 'neutral'}">
+                ${h.score > 0 ? '+' : ''}${h.score}
+              </span>
+            </div>
+          `).join('')}
+        </div>
       </div>
     `;
   }
 
-  html += '</div>';
+  // Build the matchup details card
+  let detailItems = '';
+  topPicks.slice(0, 8).forEach(([name, data]) => {
+    const lines = [];
+    data.strongAgainst.forEach(e => lines.push(`<span class="result-matchup-tag strong">beats ${e}</span>`));
+    data.weakAgainst.forEach(e => lines.push(`<span class="result-matchup-tag weak">weak vs ${e}</span>`));
+    if (lines.length > 0) {
+      detailItems += `
+        <div class="matchup-item strong" style="border-left-color: var(--border);">
+          ${heroImg(name, 32)}
+          <span style="font-weight:600; min-width:100px;">${name}</span>
+          <span class="result-matchups">${lines.join('')}</span>
+        </div>
+      `;
+    }
+  });
+
+  let html = `
+    <div class="selected-hero-header" style="margin-top:1.5rem;">
+      <div>
+        <div class="hero-name">Counter-Picks vs ${state.enemyTeam.length} Enemy Heroes</div>
+      </div>
+    </div>
+    <div class="hero-info-container">
+      ${cards}
+    </div>
+  `;
+
+  if (detailItems) {
+    html += `
+      <div class="info-card" style="margin-top:1.5rem;">
+        <h3>Matchup Details</h3>
+        <div class="matchup-list">${detailItems}</div>
+      </div>
+    `;
+  }
+
   resultsEl.innerHTML = html;
 }
 
@@ -254,40 +291,88 @@ function refreshTab3() {
     return;
   }
 
-  let html = '<div class="scroll-results">';
-
   const high = threats.filter(([, d]) => d.threatScore >= 4);
   const medium = threats.filter(([, d]) => d.threatScore >= 2 && d.threatScore < 4);
   const low = threats.filter(([, d]) => d.threatScore >= 1 && d.threatScore < 2);
 
-  if (high.length > 0) html += renderThreatGroup('High Threat - Watch Out', high, 'high');
-  if (medium.length > 0) html += renderThreatGroup('Moderate Threat', medium, 'medium');
-  if (low.length > 0) html += renderThreatGroup('Low Threat', low, 'low');
+  // Build threat cards in the same style as Tab 1
+  let cards = '';
 
-  html += '</div>';
-  resultsEl.innerHTML = html;
-}
+  if (high.length > 0) {
+    cards += `
+      <div class="info-card">
+        <h3><span class="weak">&#9660;</span> High Threats</h3>
+        <div class="matchup-list">
+          ${high.map(([name, data]) => {
+            const hero = HEROES[name];
+            const roleClass = hero ? hero.role.toLowerCase() : '';
+            return `<div class="matchup-item weak">
+              ${heroImg(name, 32)}
+              <span class="role-tag ${roleClass}">${hero ? hero.role : ''}</span>
+              ${name}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
 
-function renderThreatGroup(title, threats, level) {
-  return `
-    <div class="result-group">
-      <div class="result-group-title">${title}</div>
-      ${threats.map(([name, data]) => {
-        const hero = HEROES[name];
-        const roleClass = hero ? hero.role.toLowerCase() : '';
-        return `
-          <div class="threat-item ${level}">
-            ${heroImg(name, 28)}
-            <span class="result-hero-name">${name}</span>
-            <span class="threat-targets">
-              ${data.strongAgainst.length > 0 ? 'counters: ' + data.strongAgainst.join(', ') : ''}
-            </span>
-            <span class="threat-level ${level}">${level}</span>
-          </div>
-        `;
-      }).join('')}
+  if (medium.length > 0) {
+    cards += `
+      <div class="info-card">
+        <h3><span style="color:var(--accent);">&#9644;</span> Moderate Threats</h3>
+        <div class="matchup-list">
+          ${medium.map(([name, data]) => {
+            const hero = HEROES[name];
+            const roleClass = hero ? hero.role.toLowerCase() : '';
+            return `<div class="matchup-item weak" style="border-left-color:var(--accent);">
+              ${heroImg(name, 32)}
+              <span class="role-tag ${roleClass}">${hero ? hero.role : ''}</span>
+              ${name}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // Build details card showing which allies each threat counters
+  let detailItems = '';
+  threats.slice(0, 8).forEach(([name, data]) => {
+    if (data.strongAgainst.length > 0) {
+      detailItems += `
+        <div class="matchup-item weak" style="border-left-color: var(--border);">
+          ${heroImg(name, 32)}
+          <span style="font-weight:600; min-width:100px;">${name}</span>
+          <span class="result-matchups">
+            ${data.strongAgainst.map(a => `<span class="result-matchup-tag weak">counters ${a}</span>`).join('')}
+          </span>
+        </div>
+      `;
+    }
+  });
+
+  let html = `
+    <div class="selected-hero-header" style="margin-top:1.5rem;">
+      <div>
+        <div class="hero-name">Threats to Your ${state.yourTeam.length}-Hero Team</div>
+      </div>
+    </div>
+    <div class="hero-info-container">
+      ${cards}
     </div>
   `;
+
+  if (detailItems) {
+    html += `
+      <div class="info-card" style="margin-top:1.5rem;">
+        <h3>Who They Counter on Your Team</h3>
+        <div class="matchup-list">${detailItems}</div>
+      </div>
+    `;
+  }
+
+  resultsEl.innerHTML = html;
 }
 
 // ===== SHARED: TEAM SLOTS =====
@@ -300,13 +385,13 @@ function renderTeamSlots(containerId, team, removeCallback) {
     return;
   }
 
-  container.className = 'team-slots has-heroes';
+  container.className = 'team-slots';
   container.innerHTML = team.map(heroName => {
     const hero = HEROES[heroName];
     const roleClass = hero ? hero.role.toLowerCase() : '';
     return `
       <div class="team-slot ${roleClass}" data-hero="${heroName}">
-        <img class="hero-portrait" src="${hero.portrait}" alt="${heroName}" width="24" height="24">
+        <img class="hero-portrait" src="${hero.portrait}" alt="${heroName}" width="28" height="28">
         ${heroName}
         <span class="remove">&times;</span>
       </div>

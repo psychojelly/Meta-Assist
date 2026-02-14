@@ -233,7 +233,7 @@ body {
 /* ===== HERO INFO PANEL (Tab 1) ===== */
 .hero-info-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-top: 1.5rem;
 }
@@ -565,8 +565,7 @@ body {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  .hero-info-container,
-  .builder-layout {
+  .hero-info-container {
     grid-template-columns: 1fr;
   }
 
