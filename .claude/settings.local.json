@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /c/Psychojelly_Git/Meta-Assist remote -v)",
+      "WebSearch",
+      "WebFetch(domain:overfast-api.tekrop.fr)"
+    ]
+  }
+}

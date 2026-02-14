@@ -195,6 +195,30 @@ body {
   box-shadow: 0 0 8px var(--accent-glow);
 }
 
+/* ===== HERO PORTRAITS ===== */
+.hero-portrait {
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg-tertiary);
+}
+
+.hero-portrait-lg {
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border);
+}
+
+.hero-btn .hero-portrait {
+  border: 1px solid var(--border);
+}
+
+.hero-btn.selected .hero-portrait {
+  border-color: var(--accent);
+}
+
 .hero-btn .role-dot {
   width: 8px;
   height: 8px;

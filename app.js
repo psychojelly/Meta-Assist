@@ -6,6 +6,13 @@ const state = {
   maxTeamSize: 5
 };
 
+// Helper: get portrait img tag for a hero
+function heroImg(name, size) {
+  const hero = HEROES[name];
+  if (!hero) return '';
+  return `<img class="hero-portrait" src="${hero.portrait}" alt="${name}" width="${size}" height="${size}">`;
+}
+
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
@@ -56,10 +63,11 @@ function renderHeroGrid(containerId, clickHandler) {
     grid.className = 'hero-grid';
 
     getHeroesByRole(role).forEach(heroName => {
+      const hero = HEROES[heroName];
       const btn = document.createElement('button');
       btn.className = 'hero-btn';
       btn.dataset.hero = heroName;
-      btn.innerHTML = `<span class="role-dot ${role.toLowerCase()}"></span>${heroName}`;
+      btn.innerHTML = `<img class="hero-portrait" src="${hero.portrait}" alt="${heroName}" width="32" height="32">${heroName}`;
       btn.addEventListener('click', () => clickHandler(heroName, btn));
       grid.appendChild(btn);
     });
@@ -71,7 +79,6 @@ function renderHeroGrid(containerId, clickHandler) {
 
 // ===== TAB 1: HERO INFO =====
 function handleTab1HeroClick(heroName, btn) {
-  // Deselect previous
   const grid = document.getElementById('tab1-hero-grid');
   grid.querySelectorAll('.hero-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
@@ -93,6 +100,7 @@ function renderHeroInfo(heroName) {
 
   let html = `
     <div class="selected-hero-header">
+      <img class="hero-portrait-lg" src="${hero.portrait}" alt="${heroName}" width="64" height="64">
       <div>
         <div class="hero-name">${heroName}</div>
       </div>
@@ -106,6 +114,7 @@ function renderHeroInfo(heroName) {
             const target = HEROES[name];
             const tRole = target ? target.role.toLowerCase() : '';
             return `<div class="matchup-item strong">
+              ${heroImg(name, 28)}
               <span class="role-tag ${tRole}">${target ? target.role : ''}</span>
               ${name}
             </div>`;
@@ -119,6 +128,7 @@ function renderHeroInfo(heroName) {
             const target = HEROES[name];
             const tRole = target ? target.role.toLowerCase() : '';
             return `<div class="matchup-item weak">
+              ${heroImg(name, 28)}
               <span class="role-tag ${tRole}">${target ? target.role : ''}</span>
               ${name}
             </div>`;
@@ -143,19 +153,16 @@ function handleTab2HeroClick(heroName, btn) {
 }
 
 function refreshTab2() {
-  // Update button states
   const grid = document.getElementById('tab2-hero-grid');
   grid.querySelectorAll('.hero-btn').forEach(btn => {
     btn.classList.toggle('selected', state.enemyTeam.includes(btn.dataset.hero));
   });
 
-  // Update team slots
   renderTeamSlots('enemy-team-slots', state.enemyTeam, (heroName) => {
     state.enemyTeam = state.enemyTeam.filter(h => h !== heroName);
     refreshTab2();
   });
 
-  // Analyze and render results
   const resultsEl = document.getElementById('counter-results');
 
   if (state.enemyTeam.length === 0) {
@@ -167,7 +174,6 @@ function refreshTab2() {
   const sorted = Object.entries(scores)
     .sort(([, a], [, b]) => b.score - a.score);
 
-  // Group by role
   const topPicks = sorted.filter(([, d]) => d.score > 0).slice(0, 15);
 
   if (topPicks.length === 0) {
@@ -175,7 +181,6 @@ function refreshTab2() {
     return;
   }
 
-  // Group top picks by role
   const grouped = { Tank: [], DPS: [], Support: [] };
   topPicks.forEach(([name, data]) => {
     grouped[data.role].push({ name, ...data });
@@ -190,7 +195,7 @@ function refreshTab2() {
         <div class="result-group-title">${role} Picks</div>
         ${heroes.map(h => `
           <div class="result-item">
-            <span class="role-dot ${role.toLowerCase()}"></span>
+            ${heroImg(h.name, 28)}
             <span class="result-hero-name">${h.name}</span>
             <span class="result-matchups">
               ${h.strongAgainst.map(e => `<span class="result-matchup-tag strong">beats ${e}</span>`).join('')}
@@ -221,19 +226,16 @@ function handleTab3HeroClick(heroName, btn) {
 }
 
 function refreshTab3() {
-  // Update button states
   const grid = document.getElementById('tab3-hero-grid');
   grid.querySelectorAll('.hero-btn').forEach(btn => {
     btn.classList.toggle('selected', state.yourTeam.includes(btn.dataset.hero));
   });
 
-  // Update team slots
   renderTeamSlots('your-team-slots', state.yourTeam, (heroName) => {
     state.yourTeam = state.yourTeam.filter(h => h !== heroName);
     refreshTab3();
   });
 
-  // Analyze and render
   const resultsEl = document.getElementById('vulnerability-results');
 
   if (state.yourTeam.length === 0) {
@@ -254,20 +256,13 @@ function refreshTab3() {
 
   let html = '<div class="scroll-results">';
 
-  // Group threats by severity
   const high = threats.filter(([, d]) => d.threatScore >= 4);
   const medium = threats.filter(([, d]) => d.threatScore >= 2 && d.threatScore < 4);
   const low = threats.filter(([, d]) => d.threatScore >= 1 && d.threatScore < 2);
 
-  if (high.length > 0) {
-    html += renderThreatGroup('High Threat - Watch Out', high, 'high');
-  }
-  if (medium.length > 0) {
-    html += renderThreatGroup('Moderate Threat', medium, 'medium');
-  }
-  if (low.length > 0) {
-    html += renderThreatGroup('Low Threat', low, 'low');
-  }
+  if (high.length > 0) html += renderThreatGroup('High Threat - Watch Out', high, 'high');
+  if (medium.length > 0) html += renderThreatGroup('Moderate Threat', medium, 'medium');
+  if (low.length > 0) html += renderThreatGroup('Low Threat', low, 'low');
 
   html += '</div>';
   resultsEl.innerHTML = html;
@@ -282,7 +277,7 @@ function renderThreatGroup(title, threats, level) {
         const roleClass = hero ? hero.role.toLowerCase() : '';
         return `
           <div class="threat-item ${level}">
-            <span class="role-dot ${roleClass}"></span>
+            ${heroImg(name, 28)}
             <span class="result-hero-name">${name}</span>
             <span class="threat-targets">
               ${data.strongAgainst.length > 0 ? 'counters: ' + data.strongAgainst.join(', ') : ''}
@@ -310,14 +305,14 @@ function renderTeamSlots(containerId, team, removeCallback) {
     const hero = HEROES[heroName];
     const roleClass = hero ? hero.role.toLowerCase() : '';
     return `
-      <div class="team-slot ${roleClass}" onclick="this.remove()" data-hero="${heroName}">
+      <div class="team-slot ${roleClass}" data-hero="${heroName}">
+        <img class="hero-portrait" src="${hero.portrait}" alt="${heroName}" width="24" height="24">
         ${heroName}
         <span class="remove">&times;</span>
       </div>
     `;
   }).join('');
 
-  // Attach remove handlers
   container.querySelectorAll('.team-slot').forEach(slot => {
     slot.addEventListener('click', () => removeCallback(slot.dataset.hero));
   });
